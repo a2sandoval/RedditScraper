@@ -27,12 +27,17 @@ app.use(express.json());
 app.use(express.static("public"));
 
 // Connect to the Mongo DB
-mongoose.connect("mongodb://localhost/unit18Populater", { useNewUrlParser: true });
+// If deployed, use the deployed database. Otherwise use the local mongoHeadlines database
+var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoHeadlines";
+
+mongoose.connect(MONGODB_URI);
 
 // Routes
 
-// A GET route for scraping the echoJS website
+// A GET route for scraping the r/webdev subbreddit 
+
 app.get("/scrape", function(req, res) {
+  
   // First, we grab the body of the html with axios
   axios.get("https://old.reddit.com/r/webdev").then(function(response) {
     // Then, we load that into cheerio and save it to $ for a shorthand selector
@@ -63,7 +68,6 @@ app.get("/scrape", function(req, res) {
     res.send("Scrape Complete");
   });
 });
-
 // Route for getting all Articles from the db
 app.get("/articles", function(req, res) {
   // Grab every document in the Articles collection
